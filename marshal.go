@@ -12,6 +12,7 @@ import (
 	"io"
 	"net"
 	"reflect"
+	"runtime"
 	"strings"
 	"sync/atomic"
 	"time"
@@ -295,7 +296,10 @@ func (x *GoSNMP) sendOneRequest(packetOut *SnmpPacket,
 func (x *GoSNMP) send(packetOut *SnmpPacket, wait bool) (result *SnmpPacket, err error) {
 	defer func() {
 		if e := recover(); e != nil {
-			err = fmt.Errorf("recover: %v", e)
+			var buf = make([]byte, 8192)
+			runtime.Stack(buf, true)
+
+			err = fmt.Errorf("recover: %v\nStack:%v\n", e, string(buf))
 		}
 	}()
 
@@ -349,6 +353,11 @@ func (x *GoSNMP) send(packetOut *SnmpPacket, wait bool) (result *SnmpPacket, err
 		result, err = x.sendOneRequest(packetOut, wait)
 	}
 	return result, err
+}
+func (packet *SnmpPacket) logPrintf(format string, v ...interface{}) {
+	if packet.Logger != nil {
+		packet.Logger.Printf(format, v...)
+	}
 }
 
 // -- Marshalling Logic --------------------------------------------------------
@@ -758,10 +767,12 @@ func (x *GoSNMP) unmarshalHeader(packet []byte, response *SnmpPacket) (int, erro
 	}
 
 	if response.Version == Version3 {
+		oldcursor := cursor
 		cursor, err = x.unmarshalV3Header(packet, cursor, response)
 		if err != nil {
 			return 0, err
 		}
+		x.logPrintf("UnmarshalV3Header done. [with SecurityParameters]. Header Size %d. Last 4 Bytes=[%v]", cursor-oldcursor, packet[cursor-4:cursor])
 	} else {
 		// Parse community
 		rawCommunity, count, err := parseRawField(packet[cursor:], "community")
@@ -781,6 +792,7 @@ func (x *GoSNMP) unmarshalPayload(packet []byte, cursor int, response *SnmpPacke
 	var err error
 	// Parse SNMP packet type
 	requestType := PDUType(packet[cursor])
+	x.logPrintf("UnmarshalPayload Meet PDUType %#x. Offset %v", requestType, cursor)
 	switch requestType {
 	// known, supported types
 	case GetResponse, GetNextRequest, GetBulkRequest, Report, SNMPv2Trap, GetRequest, SetRequest, InformRequest:
@@ -796,6 +808,7 @@ func (x *GoSNMP) unmarshalPayload(packet []byte, cursor int, response *SnmpPacke
 			return fmt.Errorf("Error in unmarshalTrapV1: %s", err.Error())
 		}
 	default:
+		x.logPrintf("UnmarshalPayload Meet Unknown PDUType %#x. Offset %v", requestType, cursor)
 		return fmt.Errorf("Unknown PDUType %#x", requestType)
 	}
 	return nil
