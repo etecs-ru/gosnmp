@@ -159,7 +159,7 @@ func (x *GoSNMP) decodeValue(data []byte, msg string) (retVal *variable, err err
 		// 0x43
 		x.logPrint("decodeValue: type is TimeTicks")
 		length, cursor := parseLength(data)
-		ret, err := parseUint(data[cursor:length])
+		ret, err := parseUint32(data[cursor:length])
 		if err != nil {
 			x.logPrintf("decodeValue: err is %v", err)
 			break
@@ -588,6 +588,16 @@ func parseUint64(bytes []byte) (ret uint64, err error) {
 		ret |= uint64(bytes[bytesRead])
 	}
 	return
+}
+
+// parseUint32 treats the given bytes as a big-endian, signed integer and returns
+// the result.
+func parseUint32(bytes []byte) (uint32, error) {
+	ret, err := parseUint(bytes)
+	if err != nil {
+		return 0, err
+	}
+	return uint32(ret), nil
 }
 
 // parseUint treats the given bytes as a big-endian, signed integer and returns
