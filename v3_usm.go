@@ -591,7 +591,7 @@ func (sp *UsmSecurityParameters) decryptPacket(packet []byte, cursor int) ([]byt
 		stream.XORKeyStream(plaintext, packet[cursorTmp:])
 		copy(packet[cursor:], plaintext)
 		packet = packet[:cursor+len(plaintext)]
-	default:
+	case DES:
 		if len(packet[cursorTmp:])%des.BlockSize != 0 {
 			return nil, fmt.Errorf("error decrypting ScopedPDU: not multiple of des block size")
 		}
@@ -612,6 +612,8 @@ func (sp *UsmSecurityParameters) decryptPacket(packet []byte, cursor int) ([]byt
 		// truncate packet to remove extra space caused by the
 		// octetstring/length header that was just replaced
 		packet = packet[:cursor+len(plaintext)]
+	default:
+		return nil, fmt.Errorf("Unsupported PrivacyProtocol. Decrypt failed. PrivacyProtocol=%v", sp.PrivacyProtocol)
 	}
 	return packet, nil
 }

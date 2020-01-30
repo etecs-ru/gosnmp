@@ -709,6 +709,41 @@ var testsUnmarshal = []struct {
 			},
 		},
 	},
+	{snmpv3NotEncryptedPDU,
+		&SnmpPacket{
+			Version:    Version3,
+			PDUType:    GetResponse,
+			MsgID:      1486596974,
+			RequestID:  1564760546,
+			Error:      0,
+			ErrorIndex: 0,
+			Variables: []SnmpPDU{
+				{
+					Name:  ".1.3.6.1.2.1.2.2.1.8.6",
+					Type:  Integer,
+					Value: 2,
+				},
+				{
+					Name:  ".1.3.6.1.2.1.2.2.1.11.6",
+					Type:  Counter32,
+					Value: 0,
+				},
+				{
+					Name:  ".1.3.6.1.2.1.2.2.1.12.6",
+					Type:  Counter32,
+					Value: 0,
+				}, {
+					Name:  ".1.3.6.1.2.1.2.2.1.17.6",
+					Type:  Counter32,
+					Value: 0,
+				}, {
+					Name:  ".1.3.6.1.2.1.2.2.1.18.6",
+					Type:  Counter32,
+					Value: 0,
+				},
+			},
+		},
+	},
 }
 
 func TestUnmarshal(t *testing.T) {
@@ -1609,6 +1644,76 @@ func snmpv3HelloResponse() []byte {
 		0x0f, 0x06, 0x0a, 0x2b, 0x06, 0x01, 0x06, 0x03,
 		0x0f, 0x01, 0x01, 0x04, 0x00, 0x41, 0x01, 0x15,
 	}
+}
+
+// Simple Network Management Protocol
+//     msgVersion: snmpv3 (3)
+//     msgGlobalData
+//         msgID: 1486596974
+//         msgMaxSize: 65507
+//         msgFlags: 01
+//             .... .0.. = Reportable: Not set
+//             .... ..0. = Encrypted: Not set
+//             .... ...1 = Authenticated: Set
+//         msgSecurityModel: USM (3)
+//     msgAuthoritativeEngineID: 80001f888059dc486145a26322
+//         1... .... = Engine ID Conformance: RFC3411 (SNMPv3)
+//         Engine Enterprise ID: net-snmp (8072)
+//         Engine ID Format: Reserved/Enterprise-specific (128): Net-SNMP Random
+//         Engine ID Data: 59dc4861
+//         Engine ID Data: Creation Time: Apr 14, 1988 01:15:49 中国标准时间
+//     msgAuthoritativeEngineBoots: 8
+//     msgAuthoritativeEngineTime: 2747
+//     msgUserName: pippo4
+//     msgAuthenticationParameters: 77157e896d746779b013772c
+//     msgPrivacyParameters: <MISSING>
+//     msgData: plaintext (0)
+//         plaintext
+//             contextEngineID: 80001f888059dc486145a26322
+//                 1... .... = Engine ID Conformance: RFC3411 (SNMPv3)
+//                 Engine Enterprise ID: net-snmp (8072)
+//                 Engine ID Format: Reserved/Enterprise-specific (128): Net-SNMP Random
+//                 Engine ID Data: 59dc4861
+//                 Engine ID Data: Creation Time: Apr 14, 1988 01:15:49 中国标准时间
+//             contextName:
+//             data: get-response (2)
+//                 get-response
+//                     request-id: 1564760546
+//                     error-status: noError (0)
+//                     error-index: 0
+//                     variable-bindings: 5 items
+//                         1.3.6.1.2.1.2.2.1.8.6: 2
+//                         1.3.6.1.2.1.2.2.1.11.6: 0
+//                         1.3.6.1.2.1.2.2.1.12.6: 0
+//                         1.3.6.1.2.1.2.2.1.17.6: 0
+//                         1.3.6.1.2.1.2.2.1.18.6: 0
+
+func snmpv3NotEncryptedPDU() []byte {
+	return []byte{0x30, 0x81, 0xc0, 0x02, 0x01, 0x03, 0x30, 0x11,
+		0x02, 0x04, 0x58, 0x9b, 0xab, 0x6e, 0x02, 0x03,
+		0x00, 0xff, 0xe3, 0x04, 0x01, 0x01, 0x02, 0x01,
+		0x03, 0x04, 0x30, 0x30, 0x2e, 0x04, 0x0d, 0x80,
+		0x00, 0x1f, 0x88, 0x80, 0x59, 0xdc, 0x48, 0x61,
+		0x45, 0xa2, 0x63, 0x22, 0x02, 0x01, 0x08, 0x02,
+		0x02, 0x0a, 0xbb, 0x04, 0x06, 0x70, 0x69, 0x70,
+		0x70, 0x6f, 0x34, 0x04, 0x0c, 0x77, 0x15, 0x7e,
+		0x89, 0x6d, 0x74, 0x67, 0x79, 0xb0, 0x13, 0x77,
+		0x2c, 0x04, 0x00, 0x30, 0x76, 0x04, 0x0d, 0x80,
+		0x00, 0x1f, 0x88, 0x80, 0x59, 0xdc, 0x48, 0x61,
+		0x45, 0xa2, 0x63, 0x22, 0x04, 0x00, 0xa2, 0x63,
+		0x02, 0x04, 0x5d, 0x44, 0x59, 0xe2, 0x02, 0x01,
+		0x00, 0x02, 0x01, 0x00, 0x30, 0x55, 0x30, 0x0f,
+		0x06, 0x0a, 0x2b, 0x06, 0x01, 0x02, 0x01, 0x02,
+		0x02, 0x01, 0x08, 0x06, 0x02, 0x01, 0x02, 0x30,
+		0x0f, 0x06, 0x0a, 0x2b, 0x06, 0x01, 0x02, 0x01,
+		0x02, 0x02, 0x01, 0x0b, 0x06, 0x41, 0x01, 0x00,
+		0x30, 0x0f, 0x06, 0x0a, 0x2b, 0x06, 0x01, 0x02,
+		0x01, 0x02, 0x02, 0x01, 0x0c, 0x06, 0x41, 0x01,
+		0x00, 0x30, 0x0f, 0x06, 0x0a, 0x2b, 0x06, 0x01,
+		0x02, 0x01, 0x02, 0x02, 0x01, 0x11, 0x06, 0x41,
+		0x01, 0x00, 0x30, 0x0f, 0x06, 0x0a, 0x2b, 0x06,
+		0x01, 0x02, 0x01, 0x02, 0x02, 0x01, 0x12, 0x06,
+		0x41, 0x01, 0x00}
 }
 
 // dump bytes in a format similar to Wireshark
