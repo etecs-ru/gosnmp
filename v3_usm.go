@@ -75,7 +75,7 @@ func (sp *UsmSecurityParameters) Log() {
 
 // Copy method for UsmSecurityParameters used to copy a SnmpV3SecurityParameters without knowing it's implementation
 func (sp *UsmSecurityParameters) Copy() SnmpV3SecurityParameters {
-	return &UsmSecurityParameters{AuthoritativeEngineID: sp.AuthoritativeEngineID,
+	result := &UsmSecurityParameters{AuthoritativeEngineID: sp.AuthoritativeEngineID,
 		AuthoritativeEngineBoots: sp.AuthoritativeEngineBoots,
 		AuthoritativeEngineTime:  sp.AuthoritativeEngineTime,
 		UserName:                 sp.UserName,
@@ -91,6 +91,12 @@ func (sp *UsmSecurityParameters) Copy() SnmpV3SecurityParameters {
 		localAESSalt:             sp.localAESSalt,
 		Logger:                   sp.Logger,
 	}
+	//make a init copy
+	err := result.setSecurityParameters(sp)
+	if err != nil {
+		panic(err)
+	}
+	return result
 }
 
 func (sp *UsmSecurityParameters) getDefaultContextEngineID() string {
