@@ -91,10 +91,25 @@ func (sp *UsmSecurityParameters) Copy() SnmpV3SecurityParameters {
 		localAESSalt:             sp.localAESSalt,
 		Logger:                   sp.Logger,
 	}
-	//make a init copy
-	err := result.setSecurityParameters(sp)
-	if err != nil {
-		panic(err)
+	//make a init SecuretKey Gen
+	if len(result.SecretKey) == 0 || len(result.PrivacyKey) == 0 {
+		var err error
+		if sp.AuthenticationProtocol > NoAuth && len(sp.SecretKey) == 0 {
+			sp.SecretKey, err = genlocalkey(sp.AuthenticationProtocol,
+				sp.AuthenticationPassphrase,
+				sp.AuthoritativeEngineID)
+			if err != nil {
+				panic(err)
+			}
+		}
+		if sp.PrivacyProtocol > NoPriv && len(sp.PrivacyKey) == 0 {
+			sp.PrivacyKey, err = genlocalkey(sp.AuthenticationProtocol,
+				sp.PrivacyPassphrase,
+				sp.AuthoritativeEngineID)
+			if err != nil {
+				panic(err)
+			}
+		}
 	}
 	return result
 }
