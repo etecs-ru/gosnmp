@@ -91,8 +91,25 @@ func (sp *UsmSecurityParameters) Copy() SnmpV3SecurityParameters {
 		localAESSalt:             sp.localAESSalt,
 		Logger:                   sp.Logger,
 	}
+	return result
+}
+
+func (sp *UsmSecurityParameters) GenSalt() {
+	// http://tools.ietf.org/html/rfc2574#section-8.1.1.1
+	// localDESSalt needs to be incremented on every packet.
+	newSalt, err := sp.usmAllocateNewSalt()
+	if err != nil {
+		panic(err)
+	}
+	err = sp.usmSetSalt(newSalt)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (sp *UsmSecurityParameters) GenKeys() {
 	//make a init SecuretKey Gen
-	if len(result.SecretKey) == 0 || len(result.PrivacyKey) == 0 {
+	if len(sp.SecretKey) == 0 || len(sp.PrivacyKey) == 0 {
 		var err error
 		if sp.AuthenticationProtocol > NoAuth && len(sp.SecretKey) == 0 {
 			sp.SecretKey, err = genlocalkey(sp.AuthenticationProtocol,
@@ -111,7 +128,6 @@ func (sp *UsmSecurityParameters) Copy() SnmpV3SecurityParameters {
 			}
 		}
 	}
-	return result
 }
 
 func (sp *UsmSecurityParameters) getDefaultContextEngineID() string {
