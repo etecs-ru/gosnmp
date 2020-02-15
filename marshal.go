@@ -721,8 +721,10 @@ func marshalVarbind(pdu *SnmpPDU) ([]byte, error) {
 		case string:
 			ip := net.ParseIP(value)
 			ipAddressBytes = ipv4toBytes(ip)
+		case net.IP:
+			ipAddressBytes = ipv4toBytes(value)
 		default:
-			return nil, fmt.Errorf("unable to marshal PDU IPAddress; not []byte or String")
+			return nil, fmt.Errorf("unable to marshal PDU IPAddress; type %v not []byte or String or net.IP",reflect.TypeOf(value))
 		}
 		tmpBuf.Write([]byte{byte(IPAddress), byte(len(ipAddressBytes))})
 		tmpBuf.Write(ipAddressBytes)
