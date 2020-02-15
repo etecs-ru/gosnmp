@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"os"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -234,7 +233,7 @@ func (t *TrapListener) listenTCP(addr string) error {
 			fmt.Printf("ACCEPT: %s", conn)
 			if err != nil {
 				fmt.Println("Error accepting: ", err.Error())
-				os.Exit(1)
+				panic(err)
 			}
 			// Handle connections in a new goroutine.
 			go t.handleTCPRequest(conn)

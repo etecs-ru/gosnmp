@@ -18,7 +18,6 @@ import (
 	"math"
 	"math/big"
 	"net"
-	"os"
 	"strconv"
 	"strings"
 )
@@ -36,7 +35,7 @@ type variable struct {
 func (x *GoSNMP) Check(err error) {
 	if err != nil {
 		x.Logger.Printf("Check: %v\n", err)
-		os.Exit(1)
+		panic(err)
 	}
 }
 
@@ -44,7 +43,7 @@ func (x *GoSNMP) Check(err error) {
 func (p *SnmpPacket) Check(err error) {
 	if err != nil {
 		p.Logger.Printf("Check: %v\n", err)
-		os.Exit(1)
+		panic(err)
 	}
 }
 
@@ -52,7 +51,7 @@ func (p *SnmpPacket) Check(err error) {
 func (p *SnmpPDU) Check(err error) {
 	if err != nil {
 		p.Logger.Printf("Check: %v\n", err)
-		os.Exit(1)
+		panic(err)
 	}
 }
 
