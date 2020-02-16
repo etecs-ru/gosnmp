@@ -222,6 +222,21 @@ func (x *GoSNMP) decodeValue(data []byte, msg string) (retVal *variable, err err
 		}
 		retVal.Type = Counter64
 		retVal.Value = ret
+	case Uinteger32:
+		// 0x47
+		x.logPrint("decodeValue: type is Uinteger32")
+		length, cursor := parseLength(data)
+		if length > len(data) {
+			return retVal, fmt.Errorf("not enough data for Counter64 %x (data %d length %d)", data, len(data), length)
+		}
+
+		ret, err := parseUint32(data[cursor:length])
+		if err != nil {
+			x.logPrintf("decodeValue: err is %v", err)
+			break
+		}
+		retVal.Type = Uinteger32
+		retVal.Value = ret
 	case OpaqueFloat:
 		// 0x78
 		x.logPrint("decodeValue: type is OpaqueFloat")
