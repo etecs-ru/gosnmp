@@ -1,4 +1,4 @@
-// Copyright 2012-2018 The GoSNMP Authors. All rights reserved.  Use of this
+// Copyright 2012-2020 The GoSNMP Authors. All rights reserved.  Use of this
 // source code is governed by a BSD-style license that can be found in the
 // LICENSE file.
 
@@ -402,6 +402,9 @@ func (x *GoSNMP) unmarshalV3Header(packet []byte,
 	}
 	if cursor > len(packet) {
 		return 0, fmt.Errorf("Error parsing SNMPV3 message ID: truncted packet")
+	}
+	if response.SecurityParameters == nil {
+		response.SecurityParameters = &UsmSecurityParameters{Logger: x.Logger}
 	}
 
 	cursor, err = response.SecurityParameters.unmarshal(response.MsgFlags, packet, cursor)

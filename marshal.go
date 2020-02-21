@@ -1,4 +1,4 @@
-// Copyright 2012-2018 The GoSNMP Authors. All rights reserved.  Use of this
+// Copyright 2012-2020 The GoSNMP Authors. All rights reserved.  Use of this
 // source code is governed by a BSD-style license that can be found in the
 // LICENSE file.
 
@@ -644,7 +644,7 @@ func marshalVarbind(pdu *SnmpPDU) ([]byte, error) {
 		pduBuf.WriteByte(byte(len(oid) + len(intBytes) + 4))
 		pduBuf.Write(tmpBuf.Bytes())
 
-	case OctetString:
+	case OctetString, BitString:
 		//Oid
 		tmpBuf.Write([]byte{byte(ObjectIdentifier), byte(len(oid))})
 		tmpBuf.Write(oid)
@@ -665,7 +665,7 @@ func marshalVarbind(pdu *SnmpPDU) ([]byte, error) {
 		if err != nil {
 			return nil, err
 		}
-		tmpBuf.WriteByte(byte(OctetString))
+		tmpBuf.WriteByte(byte(pdu.Type))
 		tmpBuf.Write(length)
 		tmpBuf.Write(octetStringBytes)
 
