@@ -391,7 +391,6 @@ func marshalUint32(v interface{}) ([]byte, error) {
 
 }
 
-
 func marshalFloat32(v interface{}) ([]byte, error) {
 	//func Float64bits(f float64) uint64
 	source := v.(float32)
