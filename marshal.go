@@ -657,7 +657,7 @@ func marshalVarbind(pdu *SnmpPDU) ([]byte, error) {
 		case string:
 			octetStringBytes = []byte(value)
 		default:
-			return nil, fmt.Errorf("unable to marshal PDU OctetString; not []byte or String")
+			return nil, fmt.Errorf("unable to marshal PDU OctetString;type %v not []byte or String", reflect.TypeOf(value))
 		}
 
 		var length []byte
