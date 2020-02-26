@@ -128,6 +128,7 @@ func (x *GoSNMP) negotiateInitialSecurityParameters(packetOut *SnmpPacket, wait 
 	}
 
 	if discoveryPacket := packetOut.SecurityParameters.discoveryRequired(); discoveryPacket != nil {
+		discoveryPacket.ContextName = x.ContextName
 		result, err := x.sendOneRequest(discoveryPacket, true)
 
 		if err != nil {
